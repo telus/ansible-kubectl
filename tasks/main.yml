@@ -1,0 +1,35 @@
+---
+- name: check to see if kubectl package was already downloaded
+  stat: 
+    path: "{{ package_destination }}/kubernetes.tar.gz"
+  register: kubectl_package
+
+- name: download kubectl package
+  get_url:
+    url: https://github.com/kubernetes/kubernetes/releases/download/v{{ kubectl_version }}/kubernetes.tar.gz
+    dest: "{{ package_destination }}"
+  when: kubectl_package.stat.exists == False
+
+- name: extract kubectl package
+  unarchive: 
+    src: "{{ package_destination }}/kubernetes.tar.gz"
+    dest: "{{ package_destination }}"
+    remote_src: yes
+    mode: 0755
+  when: kubectl_package.stat.exists == True
+
+- name: check to see if kubectl package was extracted
+  stat: 
+    path: "{{ package_destination }}/kubernetes"
+  register: kubectl_package_extracted
+
+- name: copy executable to /usr/local/bin
+  become: yes
+  copy:
+    src: "{{ package_destination }}/kubernetes/platforms/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    remote_src: True
+    owner: root
+    group: root
+    mode: 0755
+  when: kubectl_package_extracted.stat.exists == True
