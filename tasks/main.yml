@@ -16,7 +16,6 @@
     dest: "{{ package_destination }}"
     remote_src: yes
     mode: 0755
-  when: kubectl_package.stat.exists == True
 
 - name: copy executable to /usr/local/bin
   become: yes
