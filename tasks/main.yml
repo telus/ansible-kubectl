@@ -18,11 +18,6 @@
     mode: 0755
   when: kubectl_package.stat.exists == True
 
-- name: check to see if kubectl package was extracted
-  stat: 
-    path: "{{ package_destination }}/kubernetes"
-  register: kubectl_package_extracted
-
 - name: copy executable to /usr/local/bin
   become: yes
   copy:
@@ -32,4 +27,3 @@
     owner: root
     group: root
     mode: 0755
-  when: kubectl_package_extracted.stat.exists == True
